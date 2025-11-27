@@ -75,6 +75,9 @@ def main():
         if "Name or service not known" in str(ex):
             print("Could not resolve OpenShift hostname. Is your VPN on?", file=sys.stderr)
             sys.exit(1)
+        elif isinstance(ex, requests.exceptions.SSLError) and "Hostname mismatch" in str(ex):
+            print("Hostname mismatch on certificate vs url. Did you connect to your company's firewall?", file=sys.stderr)
+            sys.exit(1)
         raise
 
     # Extract CSRF token and redirect URL from login form
