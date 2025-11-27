@@ -1,4 +1,4 @@
-login-to-openshift
+*.spec
 config.json
 dist
 .venv
