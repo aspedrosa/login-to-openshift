@@ -135,6 +135,7 @@ def main():
     # Extract oc command from response
     html = BeautifulSoup(token_display_response.text, 'html.parser')
     oc_command = html.find('pre').text
+    #print('Executing oc command to log in: ', oc_command)
 
     # Execute oc command
     run = subprocess.run(

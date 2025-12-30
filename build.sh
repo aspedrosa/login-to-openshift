@@ -42,7 +42,8 @@ fi
 
 pyinstaller "${PYI_ARGS[@]}" main.py
 
-echo "\nBuild complete. Binary: dist/login-to-openshift"
+echo ""
+echo "Build complete. Binary: dist/login-to-openshift"
 if [[ "${CONFIG_CREATED}" == "true" ]]; then
   echo "Note: base URL and/or username were embedded at build time via config.json."
 fi
