@@ -88,21 +88,27 @@ def main():
     then = login_form.find('input', {'name': 'then'})['value']
 
     # Post login data
-    login_response = requests.post(
-        f'{OPENSHIFT_BASE_URL}/login/LDAPS',
-        cookies=first_response.cookies,
-        data={
-            'then': then,
-            'csrf': csrf_token,
-            'username': USERNAME,
-            'password': getpass.getpass("Password: ")
-        },
-        allow_redirects=True,
-    )
+    while True:
+        login_response = requests.post(
+            f'{OPENSHIFT_BASE_URL}/login/LDAPS',
+            cookies=first_response.cookies,
+            data={
+                'then': then,
+                'csrf': csrf_token,
+                'username': USERNAME,
+                'password': getpass.getpass("Password: ")
+            },
+            allow_redirects=True,
+        )
 
-    if login_response.status_code != 200:
-        print('Login failed', file=sys.stderr)
-        sys.exit(1)
+        if login_response.status_code != 200:
+            print('Login request failed', file=sys.stderr)
+            sys.exit(1)
+
+        if "Invalid login or password. Please try again." in login_response.text:
+            print('Invalid password', file=sys.stderr)
+        else:
+            break
 
     # Extract code and CSRF token from login post response (redirected)
     html = BeautifulSoup(login_response.text, 'html.parser')
