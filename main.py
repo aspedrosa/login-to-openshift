@@ -8,6 +8,8 @@ import urllib.parse
 import requests
 from bs4 import BeautifulSoup
 
+CA_CERTS_LOCATIONS = '/etc/ssl/certs/ca-certificates.crt'  # TODO hardcoded for debian
+DEFAULT_BASE_URL = 'https://oauth-openshift.apps.ocp.dev.alticelabs.com'
 
 def _load_build_config():
     """
@@ -43,7 +45,7 @@ def _load_build_config():
 
 
 def main():
-    os.environ['REQUESTS_CA_BUNDLE'] = '/etc/ssl/certs/ca-certificates.crt'  # TODO hardcoded for debian
+    os.environ['REQUESTS_CA_BUNDLE'] = CA_CERTS_LOCATIONS
 
     build_cfg = _load_build_config()
 
@@ -53,7 +55,7 @@ def main():
     # 3) Hardcoded defaults (base URL only)
     OPENSHIFT_BASE_URL = os.getenv(
         'OPENSHIFT_BASE_URL',
-        build_cfg.get('base_url', 'https://oauth-openshift.apps.ocp.dev.alticelabs.com')
+        build_cfg.get('base_url', DEFAULT_BASE_URL)
     )
     USERNAME = os.getenv('OPENSHIFT_USERNAME', build_cfg.get('username', ''))
 
