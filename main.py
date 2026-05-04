@@ -91,6 +91,13 @@ def main():
 
     # Post login data
     while True:
+        read_from_stdin = False
+        if sys.stdin.isatty():
+            password = getpass.getpass("Password: ")
+        else:
+            read_from_stdin = True
+            password = sys.stdin.read().strip()
+
         login_response = requests.post(
             f'{OPENSHIFT_BASE_URL}/login/LDAPS',
             cookies=first_response.cookies,
@@ -98,7 +105,7 @@ def main():
                 'then': then,
                 'csrf': csrf_token,
                 'username': USERNAME,
-                'password': getpass.getpass("Password: ")
+                'password': password
             },
             allow_redirects=True,
         )
@@ -109,6 +116,10 @@ def main():
 
         if "Invalid login or password. Please try again." in login_response.text:
             print('Invalid password', file=sys.stderr)
+
+            if read_from_stdin:
+                # If we read the password from stdin, we can't prompt again, so we should exit
+                sys.exit(1)
         else:
             break
 
