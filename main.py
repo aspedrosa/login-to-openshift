@@ -3,6 +3,7 @@ import json
 import os
 import subprocess
 import sys
+import tempfile
 import urllib.parse
 
 import requests
@@ -10,6 +11,31 @@ from bs4 import BeautifulSoup
 
 CA_CERTS_LOCATIONS = '/etc/ssl/certs/ca-certificates.crt'  # TODO hardcoded for debian
 DEFAULT_BASE_URL = 'https://oauth-openshift.apps.ocp.dev.alticelabs.com'
+
+
+def extract_input_value(html, input_name, response_content=None):
+    """
+    Extract the value of an input element from HTML.
+
+    Args:
+        html: BeautifulSoup object with parsed HTML
+        input_name: name attribute of the input element to find
+        response_content: optional response text for debugging
+
+    Returns:
+        The value of the input element
+
+    Raises:
+        SystemExit: if the input element is not found
+    """
+    element = html.find('input', {'name': input_name})
+    if not element:
+        print(f'Login failed, no {input_name} found in response', file=sys.stderr)
+        with tempfile.NamedTemporaryFile(delete=False) as tmp:
+            tmp.write(response_content)
+            print(f'Full response saved to {tmp.name} for debugging', file=sys.stderr)
+        sys.exit(1)
+    return element['value']
 
 def _load_build_config():
     """
@@ -86,8 +112,12 @@ def main():
     html = BeautifulSoup(first_response.text, 'html.parser')
 
     login_form = html.find(id='co-login-form')
-    csrf_token = login_form.find('input', {'name': 'csrf'})['value']
-    then = login_form.find('input', {'name': 'then'})['value']
+    if not login_form:
+        print('Login failed, no login form found in response', file=sys.stderr)
+        sys.exit(1)
+
+    csrf_token = extract_input_value(login_form, 'csrf', first_response.text)
+    then = extract_input_value(login_form, 'then', first_response.text)
 
     # Post login data
     while True:
@@ -125,8 +155,8 @@ def main():
 
     # Extract code and CSRF token from login post response (redirected)
     html = BeautifulSoup(login_response.text, 'html.parser')
-    code = html.find('input', {'name': 'code'})['value']
-    csrf = html.find('input', {'name': 'csrf'})['value']
+    code = extract_input_value(html, 'code', login_response.text)
+    csrf = extract_input_value(html, 'csrf', login_response.text)
 
     # Make request to display oc command
     token_display_response = requests.post(
