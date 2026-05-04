@@ -1,5 +1,17 @@
-*.spec
+# Build output
+dist/
+
+# Config file (can contain sensitive build-time data)
 config.json
-dist
-.venv
-build
+
+# IDE
+.idea/
+.vscode/
+
+# Python artifacts (legacy)
+*.spec
+.venv/
+build/
+__pycache__/
+*.pyc
+
