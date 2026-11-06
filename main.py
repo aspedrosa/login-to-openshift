@@ -9,7 +9,7 @@ import urllib.parse
 import requests
 from bs4 import BeautifulSoup
 
-CA_CERTS_LOCATIONS = '/etc/ssl/certs/ca-certificates.crt'  # TODO hardcoded for debian
+CA_CERTS_LOCATIONS = '/etc/ssl/certs/ca-certificates.crt'  # TODO hardcoded for debian based distros
 DEFAULT_BASE_URL = 'https://oauth-openshift.apps.ocp.dev.alticelabs.com'
 
 

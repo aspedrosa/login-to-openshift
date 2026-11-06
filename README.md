@@ -16,7 +16,7 @@ login token so you can use `kubectl` or `oc` commands.
    ```
 3. Run build script
    ```bash
-   ./build.sh --username <username> --base-url <base-url>
+   ./build.sh --username <username> [--base-url <base-url>]
    ```
    Both of these options are optional.
 
